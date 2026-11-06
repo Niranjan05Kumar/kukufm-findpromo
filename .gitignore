@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+
+# Proprietary assignment screenplay inputs
+episodes/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Logs & debug
+*.log
+npm-debug.log*
+
+# Vercel
+.vercel/

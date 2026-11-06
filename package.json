@@ -1,0 +1,48 @@
+{
+  "name": "kukufm-microdrama-promo-finder",
+  "version": "1.0.0",
+  "description": "KukuFM microdrama screenplay parser and promo finder - Phase 1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "parse": "node src/parser.ts",
+    "validate": "node src/parser.ts",
+    "candidates": "node src/candidate_generator.ts",
+    "spot-check-candidates": "node src/spot_check_candidates.ts",
+    "evaluate": "node src/evaluator.ts",
+    "spot-check-evaluations": "node src/spot_check_evaluations.ts",
+    "rank": "node src/ranker.ts",
+    "spot-check-ranking": "node src/spot_check_ranking.ts",
+    "clean": "node src/cleaner.ts",
+    "spot-check-final": "node src/spot_check_final.ts",
+    "spot-check-platform": "node src/spot_check_platform.ts",
+    "audit": "node src/test_e2e_quality.ts",
+    "test": "npm run parse && npm run candidates && npm run evaluate && npm run rank && npm run clean"
+  },
+  "keywords": [
+    "kukufm",
+    "microdrama",
+    "screenplay-parser",
+    "phase-1"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "autoprefixer": "^10.6.2",
+    "openai": "^7.53.0",
+    "postcss": "^8.5.32",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6"
+  }
+}
