@@ -1,10 +1,70 @@
-# KukuFM AI Generalist Assignment — Phase 1: Data Understanding & Preparation
+# Find Promos — KukuFM AI Generalist Assignment
 
-This repository contains **Phase 1** of the KukuFM AI Generalist assignment: building a data-processing foundation that ingests, parses, validates, and structures the 50 microdrama screenplay episodes for downstream promotional candidate analysis.
+AI-assisted promotional clip discovery platform that analyzes 50 KukuFM microdrama screenplay episodes and identifies the best 20–60 second promotional moments.
 
 ---
 
-## 1. What Phase 1 Does
+## 📋 Executive Summary & Submission Overview
+
+### 1. Problem Statement
+Microdrama audio/video content requires gripping promotional teasers to drive viewer acquisition. Manually scouring through 50 screenplay episodes (~103 minutes of runtime, 3,727 narrative beats) is labor-intensive and subjective. This project builds an automated end-to-end pipeline and reviewer platform that identifies, evaluates, scores, deduplicates, and surfaces the highest-converting 20–60 second promotional windows.
+
+### 2. End-to-End Pipeline Approach
+1. **Screenplay Parsing (Phase 1)**: Ingests all 50 screenplay files, standardizing timestamps (`MM:SS.ss` to decimal seconds) and structuring scenes, camera shots, spoken dialogue, character deliveries, action beats, and sound FX without lossy summarization.
+2. **Candidate Generation (Phase 2)**: Generates 761 continuous temporal candidate windows adhering strictly to $20.0\text{s} \le \text{duration} \le 60.0\text{s}$, aligned to natural beat boundaries.
+3. **AI Semantic Evaluation (Phase 3)**: Evaluates each candidate independently on integer 0–5 scales across Hook (opening ~3s), Cliffhanger (closing beat), and Standalone Context (viewer clarity), providing verbatim screenplay-grounded rationales.
+4. **Deterministic Scoring & Ranking (Phase 4)**: Computes a final weighted score (0–100) and orders candidates from highest to lowest with strict deterministic tie-breaking.
+5. **Candidate Cleanup & Deduplication (Phase 5)**: Eliminates weak candidates ($\text{finalScore} < 50$) and near-duplicate overlapping cuts ($\ge 80\%$ temporal overlap relative to shorter duration within an episode), recalculating contiguous ranks ($1$ to $330$).
+6. **Interactive Review Platform (Phase 6)**: A responsive React + TypeScript + Tailwind web platform allowing reviewers to browse ranked candidates, filter by episode, inspect AI evaluation rationales, and read verbatim screenplay beats.
+
+### 3. Scoring Formula & Weights
+The final score reflects promotional performance:
+
+$$\mathbf{finalScore} = \left(\frac{\text{hookScore}}{5} \times 40\right) + \left(\frac{\text{cliffhangerScore}}{5} \times 40\right) + \left(\frac{\text{contextScore}}{5} \times 20\right)$$
+
+- **Hook (40%)**: Immediate attention grab and narrative tension in the opening ~3 seconds.
+- **Cliffhanger (40%)**: Urgency, unanswered questions, or emotional twists leaving the viewer compelled to continue watching.
+- **Standalone Context (20%)**: Self-contained clarity enabling a first-time viewer to grasp characters, conflict, and stakes.
+
+### 4. How to Run Locally
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Run the interactive review platform (http://localhost:3000)
+npm run dev
+
+# 3. Run full automated pipeline tests and validation (Phases 1 through 5)
+npm test
+
+# 4. Run end-to-end quality audit suite
+npm run audit
+```
+
+### 5. Production Build
+```bash
+# Typecheck TypeScript and compile optimized static bundle to dist/
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+### 6. Deployment Status & Vercel Readiness
+- **Vercel Readiness**: Fully configured via `vercel.json` (`buildCommand: "npm run build"`, `outputDirectory: "dist"`, `framework: "vite"`).
+- **Static Self-Contained Bundle**: The React application directly bundles the structured dataset (`data/final_promo_candidates.json`) as an asynchronous lazy-loaded chunk, requiring no runtime server, database, or external backend.
+- **Deployment Status**: Configured and ready for 1-command deployment (`npx vercel --prod` or GitHub-linked Vercel deployment). External OAuth login required on machine to deploy live.
+
+### 7. Known Limitations
+1. **Screenplay Text vs. Rendered Video**: The tool discovers promotional time windows within screenplay text and script directions; it does not process, trim, render, or play actual video or audio media files.
+2. **Deterministic Fallback Evaluation**: For offline environments without an `OPENAI_API_KEY`, the evaluator operates in a deterministic heuristic fallback mode. Live LLM evaluation uses OpenAI `gpt-4o-mini`.
+3. **Single-Episode Continuity**: Candidate windows operate within individual episode boundaries and do not stitch across consecutive episodes.
+
+---
+
+# Detailed Phase Implementation Reference
+
+## Phase 1 — Data Understanding & Preparation
 
 Phase 1 establishes a clean, structured, machine-readable dataset from the raw screenplay text files:
 - **Zero LLM / AI calls**: Strictly focused on data understanding, parsing, and validation without external APIs.
