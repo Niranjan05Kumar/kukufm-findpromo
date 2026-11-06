@@ -157,3 +157,4 @@ export function compareRankedCandidates(
   // 7. Candidate ID
   return a.candidateId.localeCompare(b.candidateId);
 }
+
