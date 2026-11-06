@@ -19,6 +19,7 @@
     "spot-check-final": "node src/spot_check_final.ts",
     "spot-check-platform": "node src/spot_check_platform.ts",
     "audit": "node src/test_e2e_quality.ts",
+    "test-upload": "node src/test_single_upload.ts",
     "test": "npm run parse && npm run candidates && npm run evaluate && npm run rank && npm run clean"
   },
   "keywords": [

@@ -935,6 +935,60 @@ The project is fully ready for deployment:
 2. **Deterministic Fallback Evaluation**: When `OPENAI_API_KEY` is not provided in `.env`, the pipeline utilizes a grounded heuristic fallback evaluation for local offline validation. Live GPT-4o-mini evaluation requires a valid OpenAI API key.
 3. **Episode-Bound Windows**: Promo candidates are constrained within individual episodes and do not span across episode boundaries.
 
+---
+
+# Phase 9 — Single Episode Upload & Test Feature
+
+Phase 9 adds a lightweight testing feature allowing users to upload another episode screenplay (`.txt`) file directly through the web interface to test the complete promo-finding pipeline on new inputs without modifying the original 50-episode dataset.
+
+---
+
+## 1. Feature Overview
+
+The **“Test Another Episode”** component enables reviewers and content creators to:
+1. Select an episode screenplay (`.txt`) from their computer.
+2. Click **“Analyze Episode”** (displaying a real-time `Analyzing episode…` loading state).
+3. Process the file through the exact same 6-stage pipeline:
+   - **Validation & Parsing**: Reuses screenplay parsing to extract scenes, elements, and timestamps.
+   - **Candidate Generation**: Reuses sliding-window generation for 20–60s promo windows.
+   - **Evaluation**: Reuses Hook, Cliffhanger, and Standalone Context scoring (0–5) with screenplay-grounded explanations.
+   - **Scoring & Ranking**: Reuses the deterministic formula $(\text{Hook}/5 \times 40) + (\text{Cliff}/5 \times 40) + (\text{Context}/5 \times 20)$ and tie-breaking.
+   - **Cleanup**: Reuses overlap deduplication ($\ge 80\%$) and weak candidate filtering ($< 50.0$).
+4. Display results immediately in the existing UI:
+   - Displays **“Test Results — Uploaded Episode”** (or identified episode number, e.g. **“Test Results — Episode 51”**).
+   - Reuses the existing `PromoCard` and `PromoDetails` components with full score badges, timing, Hook/Cliffhanger/Context rationales, and verbatim screenplay stream.
+   - Includes a **“← Back to 50-Episode Series Promos”** button to seamlessly return to the core 50-episode series dataset.
+
+---
+
+## 2. Dataset Isolation & Privacy Protection
+
+- **Zero Mutation**: The original 50-episode series data files (`data/parsed_episodes.json`, `data/promo_candidates.json`, `data/evaluated_promo_candidates.json`, `data/ranked_promo_candidates.json`, `data/final_promo_candidates.json`) are **strictly protected and never modified or overwritten**.
+- **Temporary In-Memory State**: Uploaded test episodes are held in temporary memory for testing and exploration.
+
+---
+
+## 3. Server-Side OpenAI Security & Fallback
+
+- **Zero Client API Key Leakage**: Neither the OpenAI API key nor credentials are ever passed to or exposed in the frontend.
+- **Server API Route**: The web client calls `POST /api/analyze` handled via Vite connect middleware locally or Vercel serverless function in production.
+- **Offline / Mock Fallback**: When `OPENAI_API_KEY` is not present, the pipeline evaluates candidate clips using the grounded heuristic fallback, ensuring the upload feature functions reliably in any environment.
+
+---
+
+## 4. How to Test the Upload Feature
+
+```bash
+# Run the automated unit and integration tests covering:
+# 1. Empty file validation error
+# 2. Invalid non-screenplay prose text rejection
+# 3. Valid screenplay analysis (Episode 1 content)
+# 4. Invariant check: data/final_promo_candidates.json untouched
+# 5. Synthetic episode (Episode 51) end-to-end analysis
+npm run test-upload
+```
+
+
 
 
 
